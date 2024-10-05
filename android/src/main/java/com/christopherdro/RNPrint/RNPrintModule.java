@@ -67,6 +67,7 @@ public class RNPrintModule extends ReactContextBaseJavaModule {
         final boolean isLandscape = options.hasKey("isLandscape") ? options.getBoolean("isLandscape") : false;
         final String jobName = options.hasKey("jobName") ? options.getString("jobName") : defaultJobName;
         final String baseUrl = options.hasKey("baseUrl") ? options.getString("baseUrl") : null;
+        final String paperSize = options.hasKey("paperSize") ? options.getString("paperSize") : null;
 
         if ((html == null && filePath == null) || (html != null && filePath != null)) {
             promise.reject(getName(), "Must provide either `html` or `filePath`.  Both are either missing or passed together");
@@ -117,7 +118,77 @@ public class RNPrintModule extends ReactContextBaseJavaModule {
                                     }
                                 };
                                 // Pass in the ViewView's document adapter.
-                                printManager.print(jobName, adapter, null);
+                                PrintAttributes.MediaSize mediaSize;
+                                if (paperSize != null) {
+                                    switch(paperSize) {
+                                        case "receipt":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_A7;
+                                            break;
+                                        case "a4":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_A4;
+                                            break;
+                                        case "a5":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_A5;
+                                            break;
+                                        case "a3":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_A3;
+                                            break;
+                                        case "letter":
+                                            mediaSize = PrintAttributes.MediaSize.NA_LETTER;
+                                            break;
+                                        case "legal":
+                                            mediaSize = PrintAttributes.MediaSize.NA_LEGAL;
+                                            break;
+                                        case "executive":
+                                            mediaSize = PrintAttributes.MediaSize.NA_EXECUTIVE;
+                                            break;
+                                        case "tabloid":
+                                            mediaSize = PrintAttributes.MediaSize.NA_TABLOID;
+                                            break;
+                                        case "folio":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_FOLIO;
+                                            break;
+                                        case "c5":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_C5;
+                                            break;
+                                        case "b5":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_B5;
+                                            break;
+                                        case "c6":
+                                            mediaSize = PrintAttributes.MediaSize.ISO_C6;
+                                            break;
+                                        case "japan_postcard":
+                                            mediaSize = PrintAttributes.MediaSize.JPN_POSTCARD;
+                                            break;
+                                        case "japan_double_postcard":
+                                            mediaSize = PrintAttributes.MediaSize.JPN_DOUBLE_POSTCARD;
+                                            break;
+                                        case "japan_kaku2":
+                                            mediaSize = PrintAttributes.MediaSize.JPN_KAKU2;
+                                            break;
+                                        case "japan_you4":
+                                            mediaSize = PrintAttributes.MediaSize.JPN_YOU4;
+                                            break;
+                                        case "om_small_photo":
+                                            mediaSize = PrintAttributes.MediaSize.OM_SMALL_PHOTO;
+                                            break;
+                                        case "om_large_photo":
+                                            mediaSize = PrintAttributes.MediaSize.OM_LARGE_PHOTO;
+                                            break;
+                                        default: mediaSize = isLandscape?PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE:
+                                            PrintAttributes.MediaSize.UNKNOWN_PORTRAIT;
+                                    }
+                                }
+                                else {
+                                    mediaSize = isLandscape?PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE:
+                                        PrintAttributes.MediaSize.UNKNOWN_PORTRAIT;
+                                }
+
+                                PrintAttributes printAttributes = new PrintAttributes.Builder()
+                                .setMediaSize(mediaSize)
+                                .build();
+                                // Pass in the ViewView's document adapter.
+                                printManager.print(jobName, adapter, printAttributes);
                                 mWebView = null;
                             }
                         });
